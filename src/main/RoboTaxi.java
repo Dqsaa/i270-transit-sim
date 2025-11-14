@@ -8,7 +8,7 @@ public class RoboTaxi {
     int openSeats;
     int currentLocation;
     int nextLocation;
-
+    Commuter[] passengers;
 
     public RoboTaxi(int id, int numTaxiSeats) {
         vin = id;
@@ -16,11 +16,16 @@ public class RoboTaxi {
         openSeats = capacity;
         currentLocation = 0; // STATION
         state = 0; // idle
+        passengers = new Commuter[ capacity ];
     }
 
     public void startRoute ( int rt, int locID ) {
         route = rt;
         nextLocation = locID;
+    }
+
+    public int getVin() {
+        return vin;
     }
 
     public int getRoute() {
@@ -36,6 +41,9 @@ public class RoboTaxi {
     }
 
     public void pickupCommuter ( int locID, Commuter commuter) {
-
+        if ( openSeats > 0 ) {
+            passengers[capacity - openSeats] = commuter;
+            openSeats--;
+        }
     }
 }
