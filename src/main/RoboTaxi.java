@@ -9,6 +9,7 @@ public class RoboTaxi {
     int currentLocation;
     int nextLocation;
     Commuter[] passengers;
+    
 
     public RoboTaxi(int id, int numTaxiSeats) {
         vin = id;
