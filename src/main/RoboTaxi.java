@@ -3,11 +3,14 @@ package main;
 public class RoboTaxi {
     int vin;
     int state; // 0 idle, 1 dispatching, 2 in transit
-    int route;
+    int[] route;
     int capacity;
     int openSeats;
     int currentLocation;
     int nextLocation;
+    double currentLocationTime;
+    double nextLocationTime;
+
     Commuter[] passengers;
     
 
@@ -20,9 +23,15 @@ public class RoboTaxi {
         passengers = new Commuter[ capacity ];
     }
 
-    public void startRoute ( int rt, int locID ) {
-        route = rt;
+    public void setNextLocation ( int locID ) {
         nextLocation = locID;
+    }
+
+    public void arriveLocation( int locID , double time ) {
+        currentLocation = nextLocation;
+        currentLocationTime = time;
+
+        setNextLocation( locID );
     }
 
     public int getVin() {
@@ -41,10 +50,34 @@ public class RoboTaxi {
         return openSeats;
     }
 
+    public double getCurrentLocationTime() {
+        return currentLocationTime;
+    }
+
+    public double getNextLocationTime() {
+        return nextLocationTime;
+    }
+
+
+
+    public void setNextLocationTime( double nextTime ) {
+
+        nextLocationTime = nextTime;
+    }
+
+    public void set
+
     public void pickupCommuter ( int locID, Commuter commuter) {
         if ( openSeats > 0 ) {
-            passengers[capacity - openSeats] = commuter;
+            passengers[ capacity - openSeats ] = commuter;
             openSeats--;
+        } else {
+            System.out.println("ERROR: Passenger assigned to full vehicle");
         }
+
+//        if ( nextLocation == 0 ) {
+//            nextLocation = locID;
+//            nextLocTime = locID + getTimeFromTrain( nextLocation );
+//        }
     }
 }
