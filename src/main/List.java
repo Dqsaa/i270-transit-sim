@@ -21,6 +21,19 @@ public class List<T> {
                 head = newRecord;
                 tail = newRecord;
             } else {
+                newRecord.next = head;
+                head = newRecord;
+            }
+        }
+    }
+
+    public void append(T obj) {
+        if (obj != null) {
+            ListRecord newRecord = new ListRecord(obj);
+            if (head == null) {
+                head = newRecord;
+                tail = newRecord;
+            } else {
                 tail.next = newRecord;
                 tail = newRecord;
             }
