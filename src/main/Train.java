@@ -1,3 +1,4 @@
+package main;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -26,7 +27,7 @@ public class Train {
         int count = 0;
         while (!waitingQueue.isEmpty() && count < fixedCapacity) {
             Commuter c = waitingQueue.poll();
-            c.setState(CommuterState.ON_TRAIN);
+            c.setState(Commuter.State.ON_TRAIN);
             c.markJourneyStart(now);
             boarded.add(c);
             count++;
@@ -38,7 +39,7 @@ public class Train {
 
     public void disembark(List<Commuter> onboard, double now) {
         for (Commuter c : onboard) {
-            c.setState(CommuterState.COMPLETED);
+            c.setState(Commuter.State.COMPLETED);
             c.markJourneyEnd(now);
         }
         onboard.clear();

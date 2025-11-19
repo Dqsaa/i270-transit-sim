@@ -19,8 +19,8 @@ public class Commuter {
     }
 
     public double getArrivalTime() { return arrivalTime; }
-    public String getStartLocation() { return startLocation; }
-    public String getDestination() { return destination; }
+//    public String getStartLocation() { return startLocation; }
+//    public String getDestination() { return destination; }
     public int getGroupSize() { return groupSize; }
 
     public double getTotalWait() { return totalWait; }
@@ -32,4 +32,12 @@ public class Commuter {
     public double getElapsed() {
         return totalWait + totalTravel;
     }
+
+    // Stubs for methods required by Train class
+    public void markJourneyStart( double x ) {}
+    public void markJourneyEnd( double x ) {}
+    public void setState( State st ) {}
+
+    // Enum required by Train class
+    public static enum State { ON_TRAIN, COMPLETED };
 }
