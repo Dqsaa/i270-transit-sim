@@ -90,31 +90,31 @@ public class Dispatcher {
 //        return null;
 //    }
 
-    public void callTaxi ( int locID, Commuter commuter ) {
-        int route = checkRoute( locID );
-
-        if( route == null ) {
-            System.out.println("Invalid locID, no route found");
-        } else {
-            ListRecord taxisOnRoute = getRoute( locID );
-            if( ! routeEmpty( route ) ) {
-                RoboTaxi rideShare = findRideShare( taxisOnRoute , locID );
-                if( rideShare != null ) {
-                    rideShare.pickupCommuter( locID, commuter);
-                } else {
-                    if( taxiFleet.hasNext() ) {
-                        RoboTaxi newDispatch
-                    }
-                }
-            }
-
-        }
-
-        // x assign commuter to taxi
-        // else if taxi stack not empty, pop taxi from stack and startRoute( route, locID )
-        // assign commuter to taxi
-        // else (temp)
-    }
+//    public void callTaxi ( int locID, Commuter commuter ) {
+//        int route = checkRoute( locID );
+//
+//        if( route == null ) {
+//            System.out.println("Invalid locID, no route found");
+//        } else {
+//            ListRecord taxisOnRoute = getRoute( locID );
+//            if( ! routeEmpty( route ) ) {
+//                RoboTaxi rideShare = findRideShare( taxisOnRoute , locID );
+//                if( rideShare != null ) {
+//                    rideShare.pickupCommuter( locID, commuter);
+//                } else {
+//                    if( taxiFleet.hasNext() ) {
+//                        RoboTaxi newDispatch
+//                    }
+//                }
+//            }
+//
+//        }
+//
+//        // x assign commuter to taxi
+//        // else if taxi stack not empty, pop taxi from stack and startRoute( route, locID )
+//        // assign commuter to taxi
+//        // else (temp)
+//    }
     public void callTaxi ( int locID, Commuter commuter ) {
         int route = checkRoute( locID );
 
@@ -128,8 +128,7 @@ public class Dispatcher {
             } else {
                 if ( taxiFleet.hasNext() ) {
                     currentRoute.addTaxi( rideShare );
-                    rideShare.pickupCommuter( locID, commuter );
-                    //RoboTaxi - if nextLocation == null, nextLocation = locID, double arrivedAt, double nextArrivalTime
+                    //rideShare.pickupCommuter( locID, commuter );
                 }
             }
         }
