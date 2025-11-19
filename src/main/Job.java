@@ -6,9 +6,9 @@ public class Job {
     public double serviceTime;
     public double endTime;
     public double finishedTime;
-    Customer customer;
+    Commuter customer;
 
-    public Job ( double currentTime, Customer c ) {
+    public Job ( double currentTime, Commuter c ) {
         enterTime = currentTime;
         customer = c;
     }
