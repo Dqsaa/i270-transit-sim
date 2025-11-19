@@ -11,6 +11,7 @@ public class Location {
     }
     public int getID() { return id; }
 
-    // TODO: accessors for times
+    public double getTimeFromStation() { return timeFromStation; }
 
+    public double getTimeToNext() { return timeToNext; }
 }
