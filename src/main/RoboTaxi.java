@@ -38,6 +38,10 @@ public class RoboTaxi {
         return currentLocation;
     }
 
+    public int getNextLocation() {
+        return nextLocation;
+    }
+
     public int getOpenSeats() {
         return openSeats;
     }
