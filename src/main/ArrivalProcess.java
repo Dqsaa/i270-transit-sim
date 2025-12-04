@@ -11,25 +11,16 @@ public class ArrivalProcess {
     private final int startNode;
     private final int destinationNode;
 
-    // Group size range (how many real people per Commuter)
-    private final int minGroupSize;
-    private final int maxGroupSize;
-
-
-    public ArrivalProcess(double startTime, 
-                          double lambda, 
-                          Random rng, 
-                          int startNode, 
-                          int destinationNode, 
-                          int minGroupSize, 
-                          int maxGroupSize){
+    public ArrivalProcess(double startTime,
+            double lambda,
+            Random rng,
+            int startNode,
+            int destinationNode) {
 
         this.interArrivalDist = new ExponentialDistribution(lambda);
         this.rng = rng;
         this.startNode = startNode;
         this.destinationNode = destinationNode;
-        this.minGroupSize = minGroupSize;
-        this.maxGroupSize = maxGroupSize;
         this.nextArrivalTime = startTime + interArrivalDist.sample();
     }
 
@@ -39,10 +30,8 @@ public class ArrivalProcess {
 
     public Commuter nextCommuter(double currentTime) {
         // Pick a random group size in [minGroupSize, maxGroupSize]
-        int groupSize = minGroupSize +
-                rng.nextInt(maxGroupSize - minGroupSize + 1);
-        
-        Commuter c = new Commuter(nextArrivalTime, startNode, destinationNode, groupSize);
+
+        Commuter c = new Commuter(nextArrivalTime, startNode, destinationNode);
 
         nextArrivalTime += interArrivalDist.sample();
         return c;
