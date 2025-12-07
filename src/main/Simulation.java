@@ -1,45 +1,335 @@
 package main;
 
-/*
- This will have the following:
-        ● One or more main.SingleServerQueue objects
-        ● A double type variable (“currentTime”) to represent the current time (initially 0).
-        ● A public method run( double sim_time ) to run the simulation. The parameter
-            sim_time is the length of time we wish to run for.
-        ● An main.main.ArrivalProcess object for arrival times.
-        ● A separate Queue structure to hold completed jobs. It is necessary to hold on to
-            these for processing at the end of the simulation.
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
-The run() method will start with the arrival of a first job, which can go into service in the queue
-(thus generating a service time). The doLoop method will then generate an arrival time to
-determine when the next arrival occurs. The doLoop method will also maintain the current
-time, which starts at zero.
-
-Your main() method in your main class will just create a main.Simulation object and call its run() for a
-desired length. Parameter values such as arrival time rate can be passed to constructor or set
-individually.
-
-You will be able to re-use much of the above described machinery in your traffic project.
-*/
 public class Simulation {
-    double currentTime = 0;
-    double stopTime;
-    ArrivalProcess arrivals;
 
+    // simple wrapper for each train's state (schedule + onboard passengers)
+    private static class TrainState {
+        final Train train;
+        final String label;
+        final List<Double> departureTimes;
+        int nextDepartureIndex = 0;
+        double nextDepartureTime;
+        double nextArrivalTime = Double.POSITIVE_INFINITY;
+        final List<Commuter> onboard = new ArrayList<>();
 
-    Simulation( double sim_time ) {
-        stopTime = sim_time;
-    }
-
-    void run(  ) {
-
-    }
-
-    void doLoop(  ) {
-        while( currentTime < stopTime ) {
-
+        TrainState(Train train, String label) {
+            this.train = train;
+            this.label = label;
+            this.departureTimes = train.getDepartureTimes();
+            if (!departureTimes.isEmpty()) {
+                this.nextDepartureTime = departureTimes.get(0);
+            } else {
+                this.nextDepartureTime = Double.POSITIVE_INFINITY;
+            }
         }
     }
 
-   
+    // clock
+    private double currentTime = 0.0;
+    private final double stopTime;
+
+    // one ArrivalProcess per location (locID -> process)
+    private final Map<Integer, ArrivalProcess> arrivalsByLocation;
+
+    // all train states (we're now supporting multiple trains)
+    private final List<TrainState> trains = new ArrayList<>();
+
+    // routes / road network
+    private final Route[] routes;
+
+    // dispatcher holds idle taxis in a stack
+    private final Dispatcher dispatcher;
+
+    // people at the station waiting for the train
+    private final Queue<Commuter> stationQueue = new LinkedList<>();
+
+    // data for metrics
+    private final List<Double> waitTimes = new ArrayList<>();
+    private final List<Double> passageTimes = new ArrayList<>();
+    private int completedCount = 0;
+
+    public Simulation(double simTime,
+            Map<Integer, ArrivalProcess> arrivalsByLocation,
+            List<Train> trainList,
+            Route[] routes) {
+
+        this.stopTime = simTime;
+        this.arrivalsByLocation = arrivalsByLocation;
+        this.routes = routes;
+
+        // basic taxi fleet (change numbers if you want)
+        this.dispatcher = new Dispatcher(20, 4);
+
+        // wrap each Train into a TrainState with a simple label like "Train1", "Train2"
+        for (int i = 0; i < trainList.size(); i++) {
+            Train t = trainList.get(i);
+            String label = "Train" + (i + 1);
+            trains.add(new TrainState(t, label));
+        }
+    }
+
+    // ///////////// MAIN LOOP ///////////////////////
+
+    public Metrics run() {
+
+        System.out.println("=== Traffic Simulation (Train + RoboTaxis + Routes) ===");
+
+        final double EPS = 1e-9;
+
+        while (currentTime < stopTime) {
+
+            // 1) next arrival (across all locations)
+            double nextArrivalTime = Double.POSITIVE_INFINITY;
+            int nextArrivalLoc = -1;
+            ArrivalProcess nextArrivalProcess = null;
+
+            for (Map.Entry<Integer, ArrivalProcess> entry : arrivalsByLocation.entrySet()) {
+                int locId = entry.getKey();
+                ArrivalProcess ap = entry.getValue();
+                double t = ap.getNextArrivalTime();
+                if (t < nextArrivalTime) {
+                    nextArrivalTime = t;
+                    nextArrivalLoc = locId;
+                    nextArrivalProcess = ap;
+                }
+            }
+
+            // 2) next departure / arrival across all trains
+            double earliestDeparture = Double.POSITIVE_INFINITY;
+            double earliestTrainArrival = Double.POSITIVE_INFINITY;
+
+            for (TrainState ts : trains) {
+                if (ts.nextDepartureTime < earliestDeparture) {
+                    earliestDeparture = ts.nextDepartureTime;
+                }
+                if (ts.nextArrivalTime < earliestTrainArrival) {
+                    earliestTrainArrival = ts.nextArrivalTime;
+                }
+            }
+
+            double nextEventTime = minPositive(
+                    nextArrivalTime,
+                    earliestDeparture,
+                    earliestTrainArrival);
+
+            if (nextEventTime == Double.POSITIVE_INFINITY) {
+                break; // nothing else to do
+            }
+
+            currentTime = nextEventTime;
+
+            // location arrival
+            if (Math.abs(currentTime - nextArrivalTime) < EPS && nextArrivalProcess != null) {
+                handleArrival(nextArrivalLoc, nextArrivalProcess);
+            }
+
+            // any trains departing now
+            for (TrainState ts : trains) {
+                if (Math.abs(currentTime - ts.nextDepartureTime) < EPS) {
+                    handleTrainDeparture(ts);
+                }
+            }
+
+            // any trains arriving in DC now
+            for (TrainState ts : trains) {
+                if (Math.abs(currentTime - ts.nextArrivalTime) < EPS) {
+                    handleTrainArrival(ts);
+                }
+            }
+        }
+
+        double avgWait = average(waitTimes);
+        double avgPassage = average(passageTimes);
+        double throughput = (currentTime > 0.0)
+                ? (completedCount / currentTime)
+                : 0.0;
+
+        double[] utilizations = new double[0]; // still not tracking this
+
+        return new Metrics(
+                avgWait,
+                avgPassage,
+                throughput,
+                completedCount,
+                waitTimes,
+                passageTimes,
+                utilizations);
+    }
+
+    ///////////// EVENTS ///////////////////////
+
+    // commuter shows up at a location (e.g. 10, 200, 300)
+    private void handleArrival(int locId, ArrivalProcess ap) {
+        Commuter c = ap.nextCommuter(currentTime);
+
+        System.out.printf("[%.2f] Commuter arrived at location %d%n", currentTime, locId);
+        System.out.println("        Taxi requested from location " + locId);
+
+        // decide which taxi/route serves this commuter
+        assignTaxiForCommuter(locId, c);
+
+        // taxi travel from this location back to the station
+        double taxiTravel = getTaxiTravelTime(locId);
+        c.addTravel(taxiTravel);
+
+        System.out.printf("        Taxi travel = %.2f minutes%n", taxiTravel);
+
+        // after taxi, they end up at the station and wait for the train
+        stationQueue.add(c);
+        System.out.println("        After taxi, commuter now at station. Queue size " + stationQueue.size());
+    }
+
+    // train boards from the station queue and departs
+    private void handleTrainDeparture(TrainState ts) {
+        Train train = ts.train;
+
+        System.out.printf("[%.2f] %s departing Frederick, queue size %d%n",
+                currentTime, ts.label, stationQueue.size());
+
+        List<Commuter> boarded = train.board(stationQueue, currentTime);
+
+        ts.onboard.clear();
+        ts.onboard.addAll(boarded);
+
+        // record wait times (arrival --> train boarding)
+        for (Commuter c : boarded) {
+            double wait = currentTime - c.getArrivalTime();
+            c.addWait(wait);
+            System.out.printf("        Commuter boarded %s, waited %.2f minutes%n", ts.label, wait);
+        }
+
+        // schedule this trip's DC arrival
+        if (!boarded.isEmpty()) {
+            ts.nextArrivalTime = currentTime + train.getTransitTime();
+            System.out.println("        " + ts.label + " will arrive in DC at t=" + ts.nextArrivalTime);
+        } else {
+            System.out.println("        " + ts.label + " departed empty; no arrival event scheduled.");
+            ts.nextArrivalTime = Double.POSITIVE_INFINITY;
+        }
+
+        // move to next departure in this train's schedule
+        ts.nextDepartureIndex++;
+        if (ts.nextDepartureIndex < ts.departureTimes.size()) {
+            ts.nextDepartureTime = ts.departureTimes.get(ts.nextDepartureIndex);
+        } else {
+            ts.nextDepartureTime = Double.POSITIVE_INFINITY;
+        }
+    }
+
+    // train reaches DC; trips finish
+    private void handleTrainArrival(TrainState ts) {
+        Train train = ts.train;
+        double travelTime = train.getTransitTime();
+
+        System.out.printf("[%.2f] %s arrived in DC with %d commuters%n",
+                currentTime, ts.label, ts.onboard.size());
+
+        for (Commuter c : ts.onboard) {
+            c.addTravel(travelTime);
+
+            double wait = c.getTotalWait(); // already set at departure
+            double totalTrip = c.getElapsed(); // wait + taxi + train
+
+            waitTimes.add(wait);
+            passageTimes.add(totalTrip);
+            completedCount++;
+
+            System.out.printf("        Commuter finished trip on %s: wait=%.2f min, total=%.2f min%n",
+                    ts.label, wait, totalTrip);
+        }
+
+        train.disembark(ts.onboard, currentTime);
+
+        ts.onboard.clear();
+        ts.nextArrivalTime = Double.POSITIVE_INFINITY;
+    }
+
+    //////////////// taxis / routes ////////////////////
+
+    private RoboTaxi assignTaxiForCommuter(int locId, Commuter c) {
+        Route route = findRouteForLocation(locId);
+        if (route == null) {
+            System.out.println("        No route contains location " + locId +
+                    " – commuter cannot get a taxi in this model.");
+            return null;
+        }
+
+        // first try to reuse a taxi already on this route
+        RoboTaxi taxi = route.findTaxiFor(locId);
+
+        if (taxi != null) {
+            System.out.printf("        Existing taxi %d will pick up at %d%n",
+                    taxi.getVin(), locId);
+        } else {
+            // no matching taxi, ask dispatcher for a new idle one
+            RoboTaxi idle = dispatcher.getIdleTaxi();
+            if (idle == null) {
+                System.out.println("        No idle taxis available – commuter cannot be served.");
+                return null;
+            }
+
+            System.out.printf("        New taxi %d assigned to route for loc %d%n",
+                    idle.getVin(), locId);
+
+            idle.resetAtStation();
+            route.addTaxi(idle, locId);
+
+            taxi = idle;
+        }
+
+        // put this commuter into that taxi
+        taxi.pickupCommuter(locId, c);
+        return taxi;
+    }
+
+    private Route findRouteForLocation(int locId) {
+        if (routes == null)
+            return null;
+        for (Route r : routes) {
+            if (r.getLocationIndex(locId) != -1) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    //////////// HELPERS ////////////////////////
+
+    private static double minPositive(double... values) {
+        double min = Double.POSITIVE_INFINITY;
+        for (double v : values) {
+            if (v >= 0.0 && v < min) {
+                min = v;
+            }
+        }
+        return min;
+    }
+
+    private static double average(List<Double> values) {
+        if (values == null || values.isEmpty())
+            return 0.0;
+        double sum = 0.0;
+        for (double v : values) {
+            sum += v;
+        }
+        return sum / values.size();
+    }
+
+    private double getTaxiTravelTime(int locId) {
+        if (routes == null)
+            return 0.0;
+        for (Route r : routes) {
+            int idx = r.getLocationIndex(locId);
+            if (idx != -1) {
+                return r.locations[idx].getTimeFromStation();
+            }
+        }
+        return 0.0;
+    }
 }

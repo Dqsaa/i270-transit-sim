@@ -4,7 +4,7 @@ public class Dispatcher {
     Stack<RoboTaxi> taxiFleet = new Stack<RoboTaxi>();
     Route[] routes;
     int taxiCount;
-    int taxiSeats;
+    final int taxiSeats;
 
     public Dispatcher( int numTaxi, int numTaxiSeats, Route[] rts) {
         taxiCount = numTaxi;

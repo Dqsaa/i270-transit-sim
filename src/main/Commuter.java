@@ -9,35 +9,56 @@ public class Commuter {
     private final int startLocation; // origin node
     private final int destination;// destination node
 
-    private final int groupSize; // how many real people this object represents
-
-    public Commuter(double arrivalTime, int startLocation, int destination, int groupSize) {
+    public Commuter(double arrivalTime, int startLocation, int destination) {
         this.arrivalTime = arrivalTime;
         this.startLocation = startLocation;
         this.destination = destination;
-        this.groupSize = groupSize;
     }
 
-    public double getArrivalTime() { return arrivalTime; }
-//    public String getStartLocation() { return startLocation; }
-//    public String getDestination() { return destination; }
-    public int getGroupSize() { return groupSize; }
+    public double getArrivalTime() {
+        return arrivalTime;
+    }
 
-    public double getTotalWait() { return totalWait; }
-    public double getTotalTravel() { return totalTravel; }
+    public int getStartLocation() {
+        return startLocation;
+    }
 
-    public void addWait(double dt) { totalWait += dt; }
-    public void addTravel(double dt) { totalTravel += dt; }
+    public int getDestination() {
+        return destination;
+    }
+
+    public double getTotalWait() {
+        return totalWait;
+    }
+
+    public double getTotalTravel() {
+        return totalTravel;
+    }
+
+    public void addWait(double dt) {
+        totalWait += dt;
+    }
+
+    public void addTravel(double dt) {
+        totalTravel += dt;
+    }
 
     public double getElapsed() {
         return totalWait + totalTravel;
     }
 
     // Stubs for methods required by Train class
-    public void markJourneyStart( double x ) {}
-    public void markJourneyEnd( double x ) {}
-    public void setState( State st ) {}
+    public void markJourneyStart(double x) {
+    }
+
+    public void markJourneyEnd(double x) {
+    }
+
+    public void setState(State st) {
+    }
 
     // Enum required by Train class
-    public static enum State { ON_TRAIN, COMPLETED };
+    public static enum State {
+        ON_TRAIN, COMPLETED
+    };
 }
