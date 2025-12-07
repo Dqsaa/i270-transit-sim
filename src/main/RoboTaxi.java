@@ -11,7 +11,6 @@ public class RoboTaxi {
     double nextLocationTime;
 
     Commuter[] passengers;
-    
 
     public RoboTaxi(int id, int numTaxiSeats) {
         vin = id;
@@ -19,15 +18,14 @@ public class RoboTaxi {
         openSeats = capacity;
         currentLocation = 0; // STATION
         state = 0; // idle
-        passengers = new Commuter[ capacity ];
+        passengers = new Commuter[capacity];
     }
 
-
-    public void arriveLocation( int locID , double time ) {
+    public void arriveLocation(int locID, double time) {
         currentLocation = nextLocation;
         currentLocationTime = time;
 
-        setNextLocation( locID );
+        setNextLocation(locID);
     }
 
     public int getVin() {
@@ -54,26 +52,38 @@ public class RoboTaxi {
         return nextLocationTime;
     }
 
-    public void setNextLocationTime( double nextTime ) {
+    public void setNextLocationTime(double nextTime) {
 
         nextLocationTime = nextTime;
     }
 
-    public void setCurrentLocation( int locID ) {
+    public void setCurrentLocation(int locID) {
         currentLocation = locID;
     }
 
-    public void setNextLocation( int locID ) {
+    public void setNextLocation(int locID) {
         nextLocation = locID;
     }
 
-    public void pickupCommuter ( int locID, Commuter commuter) {
-        if ( openSeats > 0 ) {
-            passengers[ capacity - openSeats ] = commuter;
+    public void pickupCommuter(int locID, Commuter commuter) {
+        if (openSeats > 0) {
+            passengers[capacity - openSeats] = commuter;
             openSeats--;
         } else {
             System.out.println("ERROR: Passenger assigned to full vehicle");
         }
-
     }
+
+    public void resetAtStation() {
+        currentLocation = 0;
+        nextLocation = 0;
+        state = 0;
+        openSeats = capacity;
+        currentLocationTime = 0.0;
+        nextLocationTime = 0.0;
+        for (int i = 0; i < capacity; i++) {
+            passengers[i] = null;
+        }
+    }
+
 }
