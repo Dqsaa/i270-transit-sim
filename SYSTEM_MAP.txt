@@ -1,0 +1,7 @@
+Route A - 103-Walkersville, 102-Worman's Mill, 101-TJ High School
+Route B - 204-New Market, 203-Oakdale, 202-Spring Ridge, 201-Airport
+Route C - 304-Urbana, 303-FSK Mall, 302-Walmart Guilford, 301-Costco
+Route D - 403-Ballenger Creek, 402-Westview S, 401-New Design Rd
+Route E - 503-Middletown, 502-Braddock Heights, 501-Golden Mile
+Route F - 604-Whittier, 603-Old Farm, 602-Hood, 601-Baker Park
+Route G - 704-FCC, 703-Ft. Detrick, 702-Thomas Johnson Dr., 701-FMH
