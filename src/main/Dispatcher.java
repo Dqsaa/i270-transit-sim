@@ -18,19 +18,19 @@ public class Dispatcher {
 
     public Route getRoute( int locID ) {
         if ( locID < 100 ) {
-            return route[0];
+            return routes[0];
         } else if ( locID < 200 ) {
-            return route[1];
+            return routes[1];
         } else if( locID < 300 ) {
-            return route[2];
+            return routes[2];
         } else if( locID < 400 ) {
-            return route[3];
+            return routes[3];
         } else if( locID < 500 ) {
-            return route[4];
+            return routes[4];
         } else if( locID < 600 ) {
-            return route[5];
+            return routes[5];
         } else if( locID < 700 ) {
-            return route[6];
+            return routes[6];
         } else return null;
     }
 
@@ -45,8 +45,9 @@ public class Dispatcher {
                 rideShare.pickupCommuter(locID, commuter);
             } else {
                 if ( taxiFleet.hasNext() ) {
-                    currentRoute.addTaxi( rideShare );
-                    //rideShare.pickupCommuter( locID, commuter );
+                    rideShare = taxiFleet.pop();
+                    currentRoute.addTaxi( rideShare, 0 );
+                    rideShare.pickupCommuter(locID, commuter);
                 }
             }
         }
