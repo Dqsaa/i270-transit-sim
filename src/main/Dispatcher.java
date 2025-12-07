@@ -2,60 +2,59 @@ package main;
 
 public class Dispatcher {
     Stack<RoboTaxi> taxiFleet = new Stack<RoboTaxi>();
-    // data structure for taxis actively in service - held by route? all together? -
-    // linked list?
-
+    Route[] routes;
     int taxiCount;
     final int taxiSeats;
 
-    public Dispatcher(int numTaxi, int numTaxiSeats) {
+    public Dispatcher( int numTaxi, int numTaxiSeats, Route[] rts) {
         taxiCount = numTaxi;
         taxiSeats = numTaxiSeats;
-        for (int i = 0; i < numTaxi; i++) {
-            taxiFleet.push(new RoboTaxi((i + 1), numTaxiSeats));
+        routes = rts;
+
+        for( int i = 0; i < numTaxi; i++ ) {
+            taxiFleet.push( new RoboTaxi( ( numTaxi - i ),  numTaxiSeats ) );
         }
-        // create given number of RoboTaxi objects
     }
 
-    public char checkRoute(int locID) {
-        if (locID < 100) {
-            return 'a';
-        } else if (locID < 200) {
-            return 'b';
-        } else if (locID < 300) {
-            return 'c';
-        } else if (locID < 400) {
-            return 'd';
-        } else if (locID < 500) {
-            return 'e';
-        } else if (locID < 600) {
-            return 'f';
-        } else
-            return 'z';
+    public Route getRoute( int locID ) {
+        if ( locID < 100 ) {
+            return routes[0];
+        } else if ( locID < 200 ) {
+            return routes[1];
+        } else if( locID < 300 ) {
+            return routes[2];
+        } else if( locID < 400 ) {
+            return routes[3];
+        } else if( locID < 500 ) {
+            return routes[4];
+        } else if( locID < 600 ) {
+            return routes[5];
+        } else if( locID < 700 ) {
+            return routes[6];
+        } else return null;
     }
 
-    public void callTaxi(int locID, Commuter commuter) {
-        char route = checkRoute(locID);
-        if (route == 'z') {
-            System.out.println("Invalid locID, no route found");
+    public void callTaxi ( int locID, Commuter commuter ) {
+        Route currentRoute = getRoute(locID);
+
+        if ( currentRoute == null ) {
+            System.out.println(" Invalid locID ");
         } else {
+            RoboTaxi rideShare = Route.findTaxiFor(locID);
+            if (rideShare != null) {
+                rideShare.pickupCommuter(locID, commuter);
+            } else {
+                if ( taxiFleet.hasNext() ) {
+                    rideShare = taxiFleet.pop();
+                    currentRoute.addTaxi( rideShare, 0 );
+                    rideShare.pickupCommuter(locID, commuter);
+                }
+            }
         }
-        // check robotaxi fleet for robotaxi on same route;
-        // if robotaxi location is > locID && not full
-        // assign commuter to taxi
-        // else if taxi stack not empty, pop taxi from stack and startRoute( route,
-        // locID )
-        // assign commuter to taxi
-        // else (temp)
     }
 
-    public RoboTaxi getIdleTaxi() {
-        return taxiFleet.pop(); // returns null if stack is empty
+    public void returnToFleet( RoboTaxi taxi ) {
+        taxiFleet.push( taxi );
     }
 
-    // Taxi has returned to station; reset it and put it back in the pool
-    public void returnToOrigin(RoboTaxi taxi) {
-        taxi.resetAtStation(); // seats back to full, location=0, etc.
-        taxiFleet.push(taxi);
-    }
 }
