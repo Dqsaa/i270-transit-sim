@@ -1,0 +1,15 @@
+# Java compiled files
+*.class
+
+# VS Code / IntelliJ output
+bin/
+out/
+target/
+build/
+
+# IDEA project metadata
+.idea/
+*.iml
+
+# OS junk
+.DS_Store
