@@ -18,19 +18,23 @@ public class Dispatcher {
 
     public Route getRoute(int locID) {
         if (locID < 100) {
-            return routes[0];
+            return null;
         } else if (locID < 200) {
-            return routes[1];
+            return routes[0];
         } else if (locID < 300) {
-            return routes[2];
+            return routes[1];
         } else if (locID < 400) {
-            return routes[3];
+            return routes[2];
         } else if (locID < 500) {
-            return routes[4];
+            return routes[3];
         } else if (locID < 600) {
+            return routes[4];
+        } else if (locID < 700) {
             return routes[5];
         } else if (locID < 800) {
             return routes[6];
+        } else if (locID < 900) {
+            return routes[7];
         } else
             return null;
     }
