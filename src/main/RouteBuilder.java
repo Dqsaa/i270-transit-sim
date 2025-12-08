@@ -137,6 +137,11 @@ public class RouteBuilder {
             Integer locId;
 
             while ((locId = rd.routeIds.next()) != null) {
+                int id = locId.intValue();
+                if (id == 0) {
+                    continue;
+                }
+
                 Location loc = findLocation(locId.intValue());
                 if (loc == null) {
                     throw new LocationIdException(routeIndex, locId);

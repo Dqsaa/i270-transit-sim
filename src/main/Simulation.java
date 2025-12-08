@@ -64,7 +64,7 @@ public class Simulation {
         this.routes = routes;
 
         // basic taxi fleet (change numbers if you want)
-        this.dispatcher = new Dispatcher(20, 4);
+        this.dispatcher = new Dispatcher(200, 4, routes);
 
         // wrap each Train into a TrainState with a simple label like "Train1", "Train2"
         for (int i = 0; i < trainList.size(); i++) {
@@ -124,22 +124,22 @@ public class Simulation {
 
             currentTime = nextEventTime;
 
-            // location arrival
+            // 1) location arrival
             if (Math.abs(currentTime - nextArrivalTime) < EPS && nextArrivalProcess != null) {
                 handleArrival(nextArrivalLoc, nextArrivalProcess);
             }
 
-            // any trains departing now
-            for (TrainState ts : trains) {
-                if (Math.abs(currentTime - ts.nextDepartureTime) < EPS) {
-                    handleTrainDeparture(ts);
-                }
-            }
-
-            // any trains arriving in DC now
+            // 2) trains ARRIVING in DC at this time
             for (TrainState ts : trains) {
                 if (Math.abs(currentTime - ts.nextArrivalTime) < EPS) {
                     handleTrainArrival(ts);
+                }
+            }
+
+            // 3) trains DEPARTING Frederick at this time
+            for (TrainState ts : trains) {
+                if (Math.abs(currentTime - ts.nextDepartureTime) < EPS) {
+                    handleTrainDeparture(ts);
                 }
             }
         }
@@ -172,7 +172,7 @@ public class Simulation {
         System.out.println("        Taxi requested from location " + locId);
 
         // decide which taxi/route serves this commuter
-        assignTaxiForCommuter(locId, c);
+        dispatcher.callTaxi(locId, c);
 
         // taxi travel from this location back to the station
         double taxiTravel = getTaxiTravelTime(locId);
@@ -251,53 +251,6 @@ public class Simulation {
     }
 
     //////////////// taxis / routes ////////////////////
-
-    private RoboTaxi assignTaxiForCommuter(int locId, Commuter c) {
-        Route route = findRouteForLocation(locId);
-        if (route == null) {
-            System.out.println("        No route contains location " + locId +
-                    " – commuter cannot get a taxi in this model.");
-            return null;
-        }
-
-        // first try to reuse a taxi already on this route
-        RoboTaxi taxi = route.findTaxiFor(locId);
-
-        if (taxi != null) {
-            System.out.printf("        Existing taxi %d will pick up at %d%n",
-                    taxi.getVin(), locId);
-        } else {
-            // no matching taxi, ask dispatcher for a new idle one
-            RoboTaxi idle = dispatcher.getIdleTaxi();
-            if (idle == null) {
-                System.out.println("        No idle taxis available – commuter cannot be served.");
-                return null;
-            }
-
-            System.out.printf("        New taxi %d assigned to route for loc %d%n",
-                    idle.getVin(), locId);
-
-            idle.resetAtStation();
-            route.addTaxi(idle, locId);
-
-            taxi = idle;
-        }
-
-        // put this commuter into that taxi
-        taxi.pickupCommuter(locId, c);
-        return taxi;
-    }
-
-    private Route findRouteForLocation(int locId) {
-        if (routes == null)
-            return null;
-        for (Route r : routes) {
-            if (r.getLocationIndex(locId) != -1) {
-                return r;
-            }
-        }
-        return null;
-    }
 
     //////////// HELPERS ////////////////////////
 
