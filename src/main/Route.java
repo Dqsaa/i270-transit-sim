@@ -30,9 +30,10 @@ public class Route {
         return true;
     }
 
-    public void addTaxi(RoboTaxi tx, int locationID) {
-        tx.setCurrentLocation(locationID);
-        tx.setNextLocation(getNextLocationID(locationID));
+    public void addTaxi(double currentTime, RoboTaxi tx, int locationID) {
+        tx.setCurrentLocation(1000);
+        tx.setNextLocation( locationID );
+        tx.setNextLocationTime( currentTime + locations[ getLocationIndex( locationID ) ].getTimeFromStation() );
         taxis.addToHead(tx);
     }
 
@@ -44,16 +45,23 @@ public class Route {
     }
 
     public void update(double currentTime) {
-
         taxis.initIteration();
         RoboTaxi taxi;
         while ((taxi = taxis.next()) != null) {
             if (currentTime > taxi.getNextLocationTime()) {
-                // update the location and next location -- next segment
-                int currentLocId = taxi.getLocation();
-                taxi.setCurrentLocation(taxi.getNextLocation());
-                taxi.setNextLocation(getNextLocationID(currentLocId));
-                // TODO: update the time
+                if (taxi.getNextLocation() == 0) {
+
+                } else {
+                    // update the location and next location -- next segment
+                    System.out.println("["+ currentTime + "] Taxi ID#" + taxi.getVin() + " arriving at " + taxi.getNextLocation() + " from " + taxi.getLocation() );
+                    taxi.setCurrentLocation(taxi.getNextLocation());
+
+                    int currentLocId = taxi.getLocation();
+                    int nextLocID = getNextLocationID(taxi.getLocation());
+                    taxi.setNextLocation(nextLocID);
+                    taxi.setNextLocationTime(currentTime + locations[getLocationIndex(currentLocId)].getTimeToNext());
+
+                }
             }
         }
     }
@@ -111,6 +119,7 @@ public class Route {
     // Returns index of this location in our array, -1 if not found.
     public int getLocationIndex(int locId) {
         for (int index = 0; index < locationCount; index++) {
+            //System.out.println("Comparing: " + locId + " to " + locations[index].getID() );
             if (locations[index].getID() == locId) {
                 return index;
             }

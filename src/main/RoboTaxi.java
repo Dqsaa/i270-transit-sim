@@ -19,6 +19,7 @@ public class RoboTaxi {
         currentLocation = 0; // STATION
         state = 0; // idle
         passengers = new Commuter[capacity];
+        System.out.println(" >> NEW TAXI WITH ID:" + vin + " << ");
     }
 
     public void arriveLocation(int locID, double time) {
@@ -72,6 +73,10 @@ public class RoboTaxi {
         } else {
             System.out.println("ERROR: Passenger assigned to full vehicle");
         }
+    }
+
+    public Commuter[] dropoffPassengers() {
+        return passengers;
     }
 
     public void resetAtStation() {
