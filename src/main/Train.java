@@ -7,7 +7,7 @@ public class Train {
     private final String id;
     private final String origin = "Frederick";
     private final String destination = "DC";
-    private final int fixedCapacity = 10;
+    private final int fixedCapacity = 900;
     private final List<Double> departureTimes;
     private final double transitTime;
 

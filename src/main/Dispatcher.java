@@ -60,15 +60,16 @@ public class Dispatcher {
             if (rideShare != null) {
                 rideShare.pickupCommuter(locID, commuter);
                 System.out.println(" > commuter assigned to vehicle ID:" + rideShare.getVin());
-            } else {
-                if (taxiFleet.hasNext()) {
+            } else if (taxiFleet.hasNext()) {
+
                     rideShare = taxiFleet.pop();
                     currentRoute.addTaxi(currentTime, rideShare, locID);
                     rideShare.pickupCommuter(locID, commuter);
                     System.out
                             .println(" > new vehicle dispatched with ID:" + rideShare.getVin() + "\n \t Traveling to: "
                                     + rideShare.getNextLocation() + " arriving at " + rideShare.getNextLocationTime());
-                }
+                } else {
+                System.out.println("-------------------no taxi available");
             }
         }
     }

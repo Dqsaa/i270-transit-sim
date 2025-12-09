@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Queue;
 
 public class Simulation {
+    int numTaxi = 300;
+    int numSeats = 6;
 
     // simple wrapper for each train's state (schedule + onboard passengers)
     private static class TrainState {
@@ -17,6 +19,7 @@ public class Simulation {
         double nextDepartureTime;
         double nextArrivalTime = Double.POSITIVE_INFINITY;
         final List<Commuter> onboard = new ArrayList<>();
+
 
         TrainState(Train train, String label) {
             this.train = train;
@@ -64,7 +67,7 @@ public class Simulation {
         this.routes = routes;
 
         // basic taxi fleet (change numbers if you want)
-        this.dispatcher = new Dispatcher(100, 4, routes);
+        this.dispatcher = new Dispatcher(numTaxi, numSeats, routes);
 
         // wrap each Train into a TrainState with a simple label like "Train1", "Train2"
         for (int i = 0; i < trainList.size(); i++) {
@@ -124,10 +127,11 @@ public class Simulation {
                 break; // nothing else to do
             }
 
-            currentTime = nextEventTime;
+            //currentTime = nextEventTime;
+            currentTime += 0.01;
 
             // 1) location arrival
-            if (Math.abs(currentTime - nextArrivalTime) < EPS && nextArrivalProcess != null) {
+            if (currentTime > nextArrivalTime && nextArrivalProcess != null) {
                 handleArrival(nextArrivalLoc, nextArrivalProcess);
             }
 
@@ -170,8 +174,8 @@ public class Simulation {
     private void handleArrival(int locId, ArrivalProcess ap) {
         Commuter c = ap.nextCommuter(currentTime);
 
-        System.out.printf("[%.2f] Commuter arrived at location %d%n", currentTime, locId);
-        System.out.println("        Taxi requested from location " + locId);
+        //System.out.printf("[%.2f] Commuter arrived at location %d%n", currentTime, locId);
+        //System.out.println("        Taxi requested from location " + locId);
 
         // decide which taxi/route serves this commuter
         dispatcher.callTaxi(currentTime, locId, c);
@@ -204,7 +208,7 @@ public class Simulation {
         for (Commuter c : boarded) {
             double wait = currentTime - c.getArrivalTime();
             c.addWait(wait);
-            System.out.printf("        Commuter boarded %s, waited %.2f minutes%n", ts.label, wait);
+            //System.out.printf("        Commuter boarded %s, waited %.2f minutes%n", ts.label, wait);
         }
 
         // schedule this trip's DC arrival
@@ -243,8 +247,8 @@ public class Simulation {
             passageTimes.add(totalTrip);
             completedCount++;
 
-            System.out.printf("        Commuter finished trip on %s: wait=%.2f min, total=%.2f min%n",
-                    ts.label, wait, totalTrip);
+            //System.out.printf("        Commuter finished trip on %s: wait=%.2f min, total=%.2f min%n",
+            //        ts.label, wait, totalTrip);
         }
 
         train.disembark(ts.onboard, currentTime);
