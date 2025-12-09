@@ -19,7 +19,6 @@ public class Location {
 
     public void arrive( Commuter c ) {
         commuterQueue.enqueue( c );
-        System.out.println("====  commuter  added  to queue at " + id);
     }
 
     public Commuter pickup() {

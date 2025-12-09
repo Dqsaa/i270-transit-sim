@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Queue;
 
 public class Simulation {
-    int numTaxi = 200;
+    int numTaxi = 175;
     int numSeats = 8;
 
     // simple wrapper for each train's state (schedule + onboard passengers)
@@ -83,7 +83,7 @@ public class Simulation {
 
         System.out.println("=== Traffic Simulation (Train + RoboTaxis + Routes) ===");
 
-        final double EPS = 1e-9;
+        final double EPS = .001;
 
         while (currentTime < stopTime) {
 

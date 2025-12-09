@@ -10,9 +10,11 @@ public class Main {
 
         public static void main(String[] args) {
                 try {
-                        double simTime = 1440.0;
+                        double simTime = 180.0;
                         double multiplier = 100;
-
+                        double trainTravelTime = 20.0; // minutes Frederick --> DC
+                        double offset1 = 10.0;
+                        double offset2 = 20.0;
 
                         // Load locations + routes from files
                         RouteBuilder rb = new RouteBuilder();
@@ -114,9 +116,7 @@ public class Main {
 
                         // create two trains
 
-                        double trainTravelTime = 10.0; // minutes Frederick --> DC
-                        double offset1 = 10.0;
-                        double offset2 = 15.0;
+
                         double offset3 = 20.0;
 
 

@@ -27,7 +27,7 @@ public class Dispatcher {
         // check for taxis at station
         // empty passengers and return to stack
         if(currentTime > 160) {
-            //System.out.println(totalCalls + " calls");
+            System.out.println(totalCalls + " calls");
         }
     }
 
