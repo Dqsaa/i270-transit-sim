@@ -10,7 +10,7 @@ public class Main {
 
         public static void main(String[] args) {
                 try {
-                        double simTime = 180.0;
+                        double simTime = 1440.0;
                         double multiplier = 100;
 
 

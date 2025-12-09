@@ -33,6 +33,7 @@ public class Train {
             count++;
         }
         totalPassengers += boarded.size();
+        System.out.println(totalPassengers + " <<<<<<");
         tripsCompleted++;
         return boarded;
     }

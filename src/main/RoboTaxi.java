@@ -22,11 +22,9 @@ public class RoboTaxi {
         // System.out.println(" >> NEW TAXI WITH ID:" + vin + " << ");
     }
 
-    public void arriveLocation(int locID, double time) {
+    public void arriveLocation(double time) {
         currentLocation = nextLocation;
         currentLocationTime = time;
-
-        setNextLocation(locID);
     }
 
     public int getVin() {

@@ -68,6 +68,7 @@ public class Route {
                         if (p != null) {
                             stationQueue.add(p);
                             taxi.passengers[i] = null;
+                            dropped++;
                         }
                     }
 
@@ -83,13 +84,19 @@ public class Route {
                     // update the location and next location -- next segment
                     System.out.println("[" + currentTime + "] Taxi ID#" + taxi.getVin() + " arriving at "
                             + taxi.getNextLocation() + " from " + taxi.getLocation());
-                    taxi.setCurrentLocation(taxi.getNextLocation());
+                    taxi.arriveLocation(currentTime);
 
                     int currentLocId = taxi.getLocation();
                     int nextLocID = getNextLocationID(taxi.getLocation());
                     taxi.setNextLocation(nextLocID);
                     taxi.setNextLocationTime(currentTime + locations[getLocationIndex(currentLocId)].getTimeToNext());
 
+                    if( taxi.getOpenSeats() > 0 ) {
+                        while( locations[getLocationIndex(currentLocId)].hasPassenger() && taxi.getOpenSeats() > 0 ) {
+                            taxi.pickupCommuter(  currentLocId, locations[getLocationIndex(currentLocId)].pickup() );
+                            //System.out.println("+++++++++ picked up from queue @"  +  currentLocId);
+                        }
+                    }
                 }
             }
         }

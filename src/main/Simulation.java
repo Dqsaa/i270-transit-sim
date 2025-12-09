@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Queue;
 
 public class Simulation {
-    int numTaxi = 300;
-    int numSeats = 6;
+    int numTaxi = 200;
+    int numSeats = 8;
 
     // simple wrapper for each train's state (schedule + onboard passengers)
     private static class TrainState {
@@ -203,7 +203,7 @@ public class Simulation {
 
         ts.onboard.clear();
         ts.onboard.addAll(boarded);
-
+        System.out.println(ts.onboard.size() + " 0000");
         // record wait times (arrival --> train boarding)
         for (Commuter c : boarded) {
             double wait = currentTime - c.getArrivalTime();

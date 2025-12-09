@@ -7,6 +7,7 @@ public class Dispatcher {
     Route[] routes;
     int taxiCount;
     final int taxiSeats;
+    int totalCalls =0;
 
     public Dispatcher(int numTaxi, int numTaxiSeats, Route[] rts) {
         taxiCount = numTaxi;
@@ -25,6 +26,9 @@ public class Dispatcher {
 
         // check for taxis at station
         // empty passengers and return to stack
+        if(currentTime > 160) {
+            //System.out.println(totalCalls + " calls");
+        }
     }
 
     public Route getRoute(int locID) {
@@ -52,7 +56,7 @@ public class Dispatcher {
 
     public void callTaxi(double currentTime, int locID, Commuter commuter) {
         Route currentRoute = getRoute(locID);
-
+        totalCalls++;
         if (currentRoute == null) {
             System.out.println(" Invalid locID ");
         } else {
@@ -62,14 +66,14 @@ public class Dispatcher {
                 System.out.println(" > commuter assigned to vehicle ID:" + rideShare.getVin());
             } else if (taxiFleet.hasNext()) {
 
-                    rideShare = taxiFleet.pop();
-                    currentRoute.addTaxi(currentTime, rideShare, locID);
-                    rideShare.pickupCommuter(locID, commuter);
-                    System.out
-                            .println(" > new vehicle dispatched with ID:" + rideShare.getVin() + "\n \t Traveling to: "
-                                    + rideShare.getNextLocation() + " arriving at " + rideShare.getNextLocationTime());
-                } else {
-                System.out.println("-------------------no taxi available");
+                rideShare = taxiFleet.pop();
+                currentRoute.addTaxi(currentTime, rideShare, locID);
+                rideShare.pickupCommuter(locID, commuter);
+                System.out
+                        .println(" > new vehicle dispatched with ID:" + rideShare.getVin() + "\n \t Traveling to: "
+                                + rideShare.getNextLocation() + " arriving at " + rideShare.getNextLocationTime());
+            } else {
+                currentRoute.locations[currentRoute.getLocationIndex(locID)].arrive(commuter);
             }
         }
     }
