@@ -10,11 +10,11 @@ public class Main {
 
         public static void main(String[] args) {
                 try {
-                        double simTime = 180.0;
-                        double multiplier = 100;
+                        double simTime = 180.0; // total simulation time in minutes
+                        double multiplier = 100; // commuter arrival rate multiplier
                         double trainTravelTime = 20.0; // minutes Frederick --> DC
-                        double offset1 = 10.0;
-                        double offset2 = 20.0;
+                        double offset1 = 10.0; // offset from sim start (0.0) to first train departure
+                        double offset2 = offset1 + ( trainTravelTime / 2 ); // offset for second train
 
                         // Load locations + routes from files
                         RouteBuilder rb = new RouteBuilder();

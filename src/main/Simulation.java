@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Queue;
 
 public class Simulation {
-    int numTaxi = 175;
-    int numSeats = 8;
+    int numTaxi = 200;
+    int numSeats = 7;
 
     // simple wrapper for each train's state (schedule + onboard passengers)
     private static class TrainState {

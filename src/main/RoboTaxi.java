@@ -9,6 +9,7 @@ public class RoboTaxi {
     int nextLocation;
     double currentLocationTime;
     double nextLocationTime;
+    int tripsCompleted;
 
     Commuter[] passengers;
 
@@ -16,7 +17,8 @@ public class RoboTaxi {
         vin = id;
         capacity = numTaxiSeats;
         openSeats = capacity;
-        currentLocation = 0; // STATION
+        currentLocation = 0;// STATION
+        tripsCompleted = 0;
         state = 0; // idle
         passengers = new Commuter[capacity];
         // System.out.println(" >> NEW TAXI WITH ID:" + vin + " << ");
@@ -78,6 +80,7 @@ public class RoboTaxi {
     }
 
     public void resetAtStation() {
+        tripsCompleted++;
         currentLocation = 0;
         nextLocation = 0;
         state = 0;
