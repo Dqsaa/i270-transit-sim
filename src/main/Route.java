@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Queue;
+
 import java.util.LinkedList;
 
 public class Route {
@@ -32,8 +34,8 @@ public class Route {
 
     public void addTaxi(double currentTime, RoboTaxi tx, int locationID) {
         tx.setCurrentLocation(1000);
-        tx.setNextLocation( locationID );
-        tx.setNextLocationTime( currentTime + locations[ getLocationIndex( locationID ) ].getTimeFromStation() );
+        tx.setNextLocation(locationID);
+        tx.setNextLocationTime(currentTime + locations[getLocationIndex(locationID)].getTimeFromStation());
         taxis.addToHead(tx);
     }
 
@@ -44,16 +46,43 @@ public class Route {
         return tx;
     }
 
-    public void update(double currentTime) {
+    public void update(double currentTime, Dispatcher dispatcher, Queue<Commuter> stationQueue) {
         taxis.initIteration();
         RoboTaxi taxi;
         while ((taxi = taxis.next()) != null) {
             if (currentTime > taxi.getNextLocationTime()) {
                 if (taxi.getNextLocation() == 0) {
+                    System.out.println("[" + currentTime + "] Taxi ID#" + taxi.getVin()
+                            + " arriving at STATION from " + taxi.getLocation());
 
+                    // mark taxi at station
+                    taxi.setCurrentLocation(0);
+                    taxi.setNextLocation(0);
+                    taxi.setNextLocationTime(Double.POSITIVE_INFINITY);
+
+                    int dropped = 0;
+
+                    // unload all passengers into the station queue
+                    for (int i = 0; i < taxi.passengers.length; i++) {
+                        Commuter p = taxi.passengers[i];
+                        if (p != null) {
+                            stationQueue.add(p);
+                            taxi.passengers[i] = null;
+                        }
+                    }
+
+                    System.out.println("    < dropped off " + dropped
+                            + " commuters, station queue size = " + stationQueue.size() + " >");
+
+                    taxi.openSeats = taxi.capacity; // reset seats
+
+                    // remove this taxi from the route and return it to the fleet
+                    removeTaxi(taxi);
+                    dispatcher.returnToFleet(taxi);
                 } else {
                     // update the location and next location -- next segment
-                    System.out.println("["+ currentTime + "] Taxi ID#" + taxi.getVin() + " arriving at " + taxi.getNextLocation() + " from " + taxi.getLocation() );
+                    System.out.println("[" + currentTime + "] Taxi ID#" + taxi.getVin() + " arriving at "
+                            + taxi.getNextLocation() + " from " + taxi.getLocation());
                     taxi.setCurrentLocation(taxi.getNextLocation());
 
                     int currentLocId = taxi.getLocation();
@@ -119,7 +148,8 @@ public class Route {
     // Returns index of this location in our array, -1 if not found.
     public int getLocationIndex(int locId) {
         for (int index = 0; index < locationCount; index++) {
-            //System.out.println("Comparing: " + locId + " to " + locations[index].getID() );
+            // System.out.println("Comparing: " + locId + " to " + locations[index].getID()
+            // );
             if (locations[index].getID() == locId) {
                 return index;
             }

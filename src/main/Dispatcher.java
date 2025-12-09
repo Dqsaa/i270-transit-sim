@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Queue;
+
 public class Dispatcher {
     Stack<RoboTaxi> taxiFleet = new Stack<RoboTaxi>();
     Route[] routes;
@@ -16,13 +18,13 @@ public class Dispatcher {
         }
     }
 
-    public void update( double currentTime ) {
-        for( int i = 0; i < routes.length; i++ ) {
-            routes[i].update( currentTime );
+    public void update(double currentTime, Queue<Commuter> stationQueue) {
+        for (int i = 0; i < routes.length; i++) {
+            routes[i].update(currentTime, this, stationQueue);
         }
 
-        //check for taxis at station
-        //empty passengers and return to stack
+        // check for taxis at station
+        // empty passengers and return to stack
     }
 
     public Route getRoute(int locID) {
@@ -57,13 +59,15 @@ public class Dispatcher {
             RoboTaxi rideShare = currentRoute.findTaxiFor(locID);
             if (rideShare != null) {
                 rideShare.pickupCommuter(locID, commuter);
-                System.out.println(" > commuter assigned to vehicle ID:" + rideShare.getVin() );
+                System.out.println(" > commuter assigned to vehicle ID:" + rideShare.getVin());
             } else {
-                if ( taxiFleet.hasNext() ) {
+                if (taxiFleet.hasNext()) {
                     rideShare = taxiFleet.pop();
-                    currentRoute.addTaxi( currentTime, rideShare, locID);
+                    currentRoute.addTaxi(currentTime, rideShare, locID);
                     rideShare.pickupCommuter(locID, commuter);
-                    System.out.println(" > new vehicle dispatched with ID:" + rideShare.getVin() + "\n \t Traveling to: " + rideShare.getNextLocation() + " arriving at " + rideShare.getNextLocationTime() );
+                    System.out
+                            .println(" > new vehicle dispatched with ID:" + rideShare.getVin() + "\n \t Traveling to: "
+                                    + rideShare.getNextLocation() + " arriving at " + rideShare.getNextLocationTime());
                 }
             }
         }

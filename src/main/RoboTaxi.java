@@ -19,7 +19,7 @@ public class RoboTaxi {
         currentLocation = 0; // STATION
         state = 0; // idle
         passengers = new Commuter[capacity];
-        System.out.println(" >> NEW TAXI WITH ID:" + vin + " << ");
+        // System.out.println(" >> NEW TAXI WITH ID:" + vin + " << ");
     }
 
     public void arriveLocation(int locID, double time) {

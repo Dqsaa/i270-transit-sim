@@ -47,7 +47,7 @@ public class Simulation {
     private final Dispatcher dispatcher;
 
     // people at the station waiting for the train
-    private final Queue<Commuter> stationQueue = new LinkedList<>();
+    private final java.util.Queue<Commuter> stationQueue = new java.util.LinkedList<>();
 
     // data for metrics
     private final List<Double> waitTimes = new ArrayList<>();
@@ -64,7 +64,7 @@ public class Simulation {
         this.routes = routes;
 
         // basic taxi fleet (change numbers if you want)
-        this.dispatcher = new Dispatcher(200, 4, routes);
+        this.dispatcher = new Dispatcher(100, 4, routes);
 
         // wrap each Train into a TrainState with a simple label like "Train1", "Train2"
         for (int i = 0; i < trainList.size(); i++) {
@@ -82,10 +82,9 @@ public class Simulation {
 
         final double EPS = 1e-9;
 
-
         while (currentTime < stopTime) {
 
-            dispatcher.update( currentTime );
+            dispatcher.update(currentTime, stationQueue);
 
             // 1) next arrival (across all locations)
             double nextArrivalTime = Double.POSITIVE_INFINITY;
@@ -178,14 +177,15 @@ public class Simulation {
         dispatcher.callTaxi(currentTime, locId, c);
 
         // taxi to this location
-        double taxiTravel = getTaxiTravelTime(locId);
-        //c.addWait(taxiTravel);
+        // double taxiTravel = getTaxiTravelTime(locId);
+        // c.addWait(taxiTravel);
 
-        //System.out.printf("        Taxi travel = %.2f minutes%n", taxiTravel);
+        // System.out.printf(" Taxi travel = %.2f minutes%n", taxiTravel);
 
         // after taxi, they end up at the station and wait for the train
-        //stationQueue.add(c);
-        //System.out.println("        After taxi, commuter now at station. Queue size " + stationQueue.size());
+        // stationQueue.add(c);
+        // System.out.println(" After taxi, commuter now at station. Queue size " +
+        // stationQueue.size());
     }
 
     // train boards from the station queue and departs
@@ -275,17 +275,5 @@ public class Simulation {
             sum += v;
         }
         return sum / values.size();
-    }
-
-    private double getTaxiTravelTime(int locId) {
-        if (routes == null)
-            return 0.0;
-        for (Route r : routes) {
-            int idx = r.getLocationIndex(locId);
-            if (idx != -1) {
-                return r.locations[idx].getTimeFromStation();
-            }
-        }
-        return 0.0;
     }
 }

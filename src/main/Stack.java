@@ -9,15 +9,15 @@ public class Stack<T> {
     }
 
     public void empty() {
-        while( pop() != null ) {
+        while (pop() != null) {
         }
     }
 
     public T pop() {
         T obj = null;
-        if( stack != null ) {
+        if (stack != null) {
             obj = stack.data;
-            if( stack.before != null ) {
+            if (stack.before != null) {
                 stack = stack.before;
             } else {
                 stack = null;
@@ -31,13 +31,13 @@ public class Stack<T> {
         return stack != null;
     }
 
-    public void push( T element ) {
-        if( stack == null ) {
+    public void push(T element) {
+        if (stack == null) {
             System.out.println("< new stack created");
-            stack = new StackItem( element );
-        } else  {
-            System.out.println("< added to stack");
-            StackItem newItem = new StackItem( element );
+            stack = new StackItem(element);
+        } else {
+            // System.out.println("< added to stack");
+            StackItem newItem = new StackItem(element);
             newItem.before = stack;
             stack = newItem;
         }
@@ -47,7 +47,7 @@ public class Stack<T> {
         public StackItem before;
         public T data;
 
-        public StackItem( T element ) {
+        public StackItem(T element) {
             data = element;
             before = null;
         }
