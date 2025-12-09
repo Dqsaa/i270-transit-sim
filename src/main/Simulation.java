@@ -82,7 +82,10 @@ public class Simulation {
 
         final double EPS = 1e-9;
 
+
         while (currentTime < stopTime) {
+
+            dispatcher.update( currentTime );
 
             // 1) next arrival (across all locations)
             double nextArrivalTime = Double.POSITIVE_INFINITY;
@@ -172,17 +175,17 @@ public class Simulation {
         System.out.println("        Taxi requested from location " + locId);
 
         // decide which taxi/route serves this commuter
-        dispatcher.callTaxi(locId, c);
+        dispatcher.callTaxi(currentTime, locId, c);
 
-        // taxi travel from this location back to the station
+        // taxi to this location
         double taxiTravel = getTaxiTravelTime(locId);
-        c.addTravel(taxiTravel);
+        //c.addWait(taxiTravel);
 
-        System.out.printf("        Taxi travel = %.2f minutes%n", taxiTravel);
+        //System.out.printf("        Taxi travel = %.2f minutes%n", taxiTravel);
 
         // after taxi, they end up at the station and wait for the train
-        stationQueue.add(c);
-        System.out.println("        After taxi, commuter now at station. Queue size " + stationQueue.size());
+        //stationQueue.add(c);
+        //System.out.println("        After taxi, commuter now at station. Queue size " + stationQueue.size());
     }
 
     // train boards from the station queue and departs

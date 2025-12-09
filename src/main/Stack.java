@@ -28,13 +28,15 @@ public class Stack<T> {
     }
 
     public boolean hasNext() {
-        return stack == null;
+        return stack != null;
     }
 
     public void push( T element ) {
         if( stack == null ) {
+            System.out.println("< new stack created");
             stack = new StackItem( element );
         } else  {
+            System.out.println("< added to stack");
             StackItem newItem = new StackItem( element );
             newItem.before = stack;
             stack = newItem;

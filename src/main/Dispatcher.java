@@ -16,6 +16,15 @@ public class Dispatcher {
         }
     }
 
+    public void update( double currentTime ) {
+        for( int i = 0; i < routes.length; i++ ) {
+            routes[i].update( currentTime );
+        }
+
+        //check for taxis at station
+        //empty passengers and return to stack
+    }
+
     public Route getRoute(int locID) {
         if (locID < 100) {
             return null;
@@ -39,7 +48,7 @@ public class Dispatcher {
             return null;
     }
 
-    public void callTaxi(int locID, Commuter commuter) {
+    public void callTaxi(double currentTime, int locID, Commuter commuter) {
         Route currentRoute = getRoute(locID);
 
         if (currentRoute == null) {
@@ -48,11 +57,13 @@ public class Dispatcher {
             RoboTaxi rideShare = currentRoute.findTaxiFor(locID);
             if (rideShare != null) {
                 rideShare.pickupCommuter(locID, commuter);
+                System.out.println(" > commuter assigned to vehicle ID:" + rideShare.getVin() );
             } else {
-                if (taxiFleet.hasNext()) {
+                if ( taxiFleet.hasNext() ) {
                     rideShare = taxiFleet.pop();
-                    currentRoute.addTaxi(rideShare, 0);
+                    currentRoute.addTaxi( currentTime, rideShare, locID);
                     rideShare.pickupCommuter(locID, commuter);
+                    System.out.println(" > new vehicle dispatched with ID:" + rideShare.getVin() + "\n \t Traveling to: " + rideShare.getNextLocation() + " arriving at " + rideShare.getNextLocationTime() );
                 }
             }
         }
