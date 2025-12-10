@@ -54,6 +54,7 @@ public class Simulation {
     // data for metrics
     private final List<Double> waitTimes = new ArrayList<>();
     private final List<Double> passageTimes = new ArrayList<>();
+    private final List<Integer> trainPassengerCounts = new ArrayList<>();
     private int completedCount = 0;
 
     public Simulation(double simTime,
@@ -158,6 +159,7 @@ public class Simulation {
         double[] utilizations = new double[0]; // still not tracking this
 
         System.out.printf("Avg passengers per taxi trip: %.2f%n", dispatcher.getAvgPassengersPerTrip());
+        System.out.printf("Avg passengers per train trip: %.2f%n", averageInt( trainPassengerCounts ));
 
         return new Metrics(
                 avgWait,
@@ -240,6 +242,8 @@ public class Simulation {
         System.out.printf("[%.2f] %s arrived in DC with %d commuters%n",
                 currentTime, ts.label, ts.onboard.size());
 
+        trainPassengerCounts.add( ts.onboard.size() );
+
         for (Commuter c : ts.onboard) {
             c.addTravel(travelTime);
 
@@ -279,6 +283,15 @@ public class Simulation {
         if (values == null || values.isEmpty())
             return 0.0;
         double sum = 0.0;
+        for (double v : values) {
+            sum += v;
+        }
+        return sum / values.size();
+    }
+    private static double averageInt(List<Integer> values) {
+        if (values == null || values.isEmpty())
+            return 0;
+        double sum = 0;
         for (double v : values) {
             sum += v;
         }
