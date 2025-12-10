@@ -7,7 +7,11 @@ public class Dispatcher {
     Route[] routes;
     int taxiCount;
     final int taxiSeats;
-    int totalCalls =0;
+    int totalCalls = 0;
+
+    // for metrics
+    int totalTaxiTrips = 0;
+    int totalTaxiPassengers = 0;
 
     public Dispatcher(int numTaxi, int numTaxiSeats, Route[] rts) {
         taxiCount = numTaxi;
@@ -26,7 +30,7 @@ public class Dispatcher {
 
         // check for taxis at station
         // empty passengers and return to stack
-        if(currentTime > 160) {
+        if (currentTime > 160) {
             System.out.println(totalCalls + " calls");
         }
     }
@@ -76,6 +80,23 @@ public class Dispatcher {
                 currentRoute.locations[currentRoute.getLocationIndex(locID)].arrive(commuter);
             }
         }
+    }
+
+    public void recordTrip(int passengersThisTrip) {
+        totalTaxiTrips++;
+        totalTaxiPassengers += passengersThisTrip;
+    }
+
+    public double getAvgPassengersPerTrip() {
+        if (totalTaxiTrips == 0)
+            return 0.0;
+        return (double) totalTaxiPassengers / totalTaxiTrips;
+    }
+
+    public double getAvgTripsPerTaxi(int fleetSize) {
+        if (fleetSize == 0)
+            return 0.0;
+        return (double) totalTaxiTrips / fleetSize;
     }
 
     public void returnToFleet(RoboTaxi taxi) {

@@ -55,6 +55,8 @@ public class Route {
                     System.out.println("[" + currentTime + "] Taxi ID#" + taxi.getVin()
                             + " arriving at STATION from " + taxi.getLocation());
 
+                    dispatcher.totalTaxiTrips++;
+
                     // mark taxi at station
                     taxi.setCurrentLocation(0);
                     taxi.setNextLocation(0);
@@ -77,6 +79,8 @@ public class Route {
 
                     taxi.openSeats = taxi.capacity; // reset seats
 
+                    dispatcher.recordTrip(dropped);
+
                     // remove this taxi from the route and return it to the fleet
                     removeTaxi(taxi);
                     dispatcher.returnToFleet(taxi);
@@ -91,10 +95,10 @@ public class Route {
                     taxi.setNextLocation(nextLocID);
                     taxi.setNextLocationTime(currentTime + locations[getLocationIndex(currentLocId)].getTimeToNext());
 
-                    if( taxi.getOpenSeats() > 0 ) {
-                        while( locations[getLocationIndex(currentLocId)].hasPassenger() && taxi.getOpenSeats() > 0 ) {
-                            taxi.pickupCommuter(  currentLocId, locations[getLocationIndex(currentLocId)].pickup() );
-                            //System.out.println("+++++++++ picked up from queue @"  +  currentLocId);
+                    if (taxi.getOpenSeats() > 0) {
+                        while (locations[getLocationIndex(currentLocId)].hasPassenger() && taxi.getOpenSeats() > 0) {
+                            taxi.pickupCommuter(currentLocId, locations[getLocationIndex(currentLocId)].pickup());
+                            // System.out.println("+++++++++ picked up from queue @" + currentLocId);
                         }
                     }
                 }

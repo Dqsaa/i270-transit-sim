@@ -20,7 +20,6 @@ public class Simulation {
         double nextArrivalTime = Double.POSITIVE_INFINITY;
         final List<Commuter> onboard = new ArrayList<>();
 
-
         TrainState(Train train, String label) {
             this.train = train;
             this.label = label;
@@ -127,7 +126,7 @@ public class Simulation {
                 break; // nothing else to do
             }
 
-            //currentTime = nextEventTime;
+            // currentTime = nextEventTime;
             currentTime += 0.01;
 
             // 1) location arrival
@@ -158,6 +157,8 @@ public class Simulation {
 
         double[] utilizations = new double[0]; // still not tracking this
 
+        System.out.printf("Avg passengers per taxi trip: %.2f%n", dispatcher.getAvgPassengersPerTrip());
+
         return new Metrics(
                 avgWait,
                 avgPassage,
@@ -174,8 +175,9 @@ public class Simulation {
     private void handleArrival(int locId, ArrivalProcess ap) {
         Commuter c = ap.nextCommuter(currentTime);
 
-        //System.out.printf("[%.2f] Commuter arrived at location %d%n", currentTime, locId);
-        //System.out.println("        Taxi requested from location " + locId);
+        // System.out.printf("[%.2f] Commuter arrived at location %d%n", currentTime,
+        // locId);
+        // System.out.println(" Taxi requested from location " + locId);
 
         // decide which taxi/route serves this commuter
         dispatcher.callTaxi(currentTime, locId, c);
@@ -208,7 +210,8 @@ public class Simulation {
         for (Commuter c : boarded) {
             double wait = currentTime - c.getArrivalTime();
             c.addWait(wait);
-            //System.out.printf("        Commuter boarded %s, waited %.2f minutes%n", ts.label, wait);
+            // System.out.printf(" Commuter boarded %s, waited %.2f minutes%n", ts.label,
+            // wait);
         }
 
         // schedule this trip's DC arrival
@@ -247,8 +250,9 @@ public class Simulation {
             passageTimes.add(totalTrip);
             completedCount++;
 
-            //System.out.printf("        Commuter finished trip on %s: wait=%.2f min, total=%.2f min%n",
-            //        ts.label, wait, totalTrip);
+            // System.out.printf(" Commuter finished trip on %s: wait=%.2f min, total=%.2f
+            // min%n",
+            // ts.label, wait, totalTrip);
         }
 
         train.disembark(ts.onboard, currentTime);
@@ -279,5 +283,13 @@ public class Simulation {
             sum += v;
         }
         return sum / values.size();
+    }
+
+    public Dispatcher getDispatcher() {
+        return dispatcher;
+    }
+
+    public int getTaxiFleetSize() {
+        return numTaxi;
     }
 }
